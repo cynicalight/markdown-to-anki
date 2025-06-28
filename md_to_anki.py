@@ -246,7 +246,7 @@ class AnkiCardGenerator:
             self.cards.append((front, back))
 
             # 避免API频率限制
-            time.sleep(1)
+            time.sleep(0.1)
 
     def process_highlighted_sentences(self, sentences: List[str]):
         """处理高亮文本（好句子）"""

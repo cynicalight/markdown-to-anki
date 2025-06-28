@@ -349,7 +349,7 @@ export default class MdToAnkiPlugin extends Plugin {
                     exporter.addWordCard(word.text, translation);
 
                     // 添加延迟避免API频率限制
-                    await this.sleep(1000);
+                    await this.sleep(100);
                 }
             }
 
@@ -361,7 +361,7 @@ export default class MdToAnkiPlugin extends Plugin {
                     exporter.addPhraseCard(phrase.text, translation);
 
                     // 添加延迟避免API频率限制
-                    await this.sleep(1000);
+                    await this.sleep(100);
                 }
             }
 
@@ -373,17 +373,24 @@ export default class MdToAnkiPlugin extends Plugin {
                     exporter.addSentenceCard(sentence, translation);
 
                     // 添加延迟避免API频率限制
-                    await this.sleep(1000);
+                    await this.sleep(100);
                 }
             }
 
             // 生成输出文件
             const ankiContent = exporter.exportToAnkiFormat();
             const outputFileName = `${activeFile.basename}_anki_cards.txt`;
-            const outputPath = this.settings.outputPath || activeFile.parent?.path || '';
-            const fullOutputPath = outputPath ? `${outputPath}/${outputFileName}` : outputFileName;
 
-            await this.app.vault.create(fullOutputPath, ankiContent);
+            // 检查是否为绝对路径
+            if (this.settings.outputPath && this.isAbsolutePath(this.settings.outputPath)) {
+                // 绝对路径：使用文件系统API写入
+                await this.writeToAbsolutePath(this.settings.outputPath, outputFileName, ankiContent);
+            } else {
+                // 相对路径：在Obsidian库内创建
+                const outputPath = this.settings.outputPath || activeFile.parent?.path || '';
+                const fullOutputPath = outputPath ? `${outputPath}/${outputFileName}` : outputFileName;
+                await this.app.vault.create(fullOutputPath, ankiContent);
+            }
 
             modal.close();
             new Notice(`成功生成 ${exporter.getCardCount()} 张Anki闪卡！文件已保存为: ${outputFileName}`);
@@ -397,6 +404,48 @@ export default class MdToAnkiPlugin extends Plugin {
 
     private sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    private isAbsolutePath(path: string): boolean {
+        // 检查是否为绝对路径
+        return path.startsWith('/') || // Unix/Mac 绝对路径
+            /^[A-Za-z]:\\/.test(path) || // Windows 绝对路径 (C:\)
+            path.startsWith('~'); // 用户主目录路径
+    }
+
+    private async writeToAbsolutePath(dirPath: string, fileName: string, content: string): Promise<void> {
+        try {
+            // 展开用户主目录路径
+            let fullDirPath = dirPath;
+            if (dirPath.startsWith('~')) {
+                // 在浏览器环境中，我们无法直接访问用户主目录
+                // 这里提供一个提示信息
+                throw new Error('浏览器环境下无法访问用户主目录，请使用完整路径');
+            }
+
+            const fullPath = `${fullDirPath}/${fileName}`;
+
+            // 创建下载链接（浏览器环境下的替代方案）
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            // 创建临时下载链接
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            link.style.display = 'none';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // 清理URL对象
+            URL.revokeObjectURL(url);
+
+            new Notice(`文件已下载到浏览器默认下载目录: ${fileName}`);
+        } catch (error) {
+            throw new Error(`无法写入到绝对路径: ${error.message}`);
+        }
     }
 
     async loadSettings() {
@@ -438,9 +487,9 @@ class MdToAnkiSettingTab extends PluginSettingTab {
         // 输出路径设置
         new Setting(containerEl)
             .setName('输出文件路径')
-            .setDesc('生成的Anki文件保存路径（留空则保存在当前文件同目录）')
+            .setDesc('生成的Anki文件保存路径。支持：\n• 相对路径（在当前库内）：如 "Anki Cards"\n• 绝对路径（下载到系统目录）：如 "/Users/用户名/Downloads"\n• 留空则保存在当前文件同目录')
             .addText(text => text
-                .setPlaceholder('例如: Anki Cards')
+                .setPlaceholder('例如: /Users/jz/Downloads 或 Anki Cards')
                 .setValue(this.plugin.settings.outputPath)
                 .onChange(async (value) => {
                     this.plugin.settings.outputPath = value;
