@@ -222,7 +222,7 @@ class AnkiCardGenerator:
 
             # 生成闪卡
             front = word
-            back = f"{translation['meaning']}<br><br><i>{translation['example']}</i>"
+            back = f"{translation['meaning']}<br><br>{translation['example']}"
 
             self.cards.append((front, back))
 
@@ -241,7 +241,7 @@ class AnkiCardGenerator:
 
             # 生成闪卡
             front = phrase
-            back = f"{translation['meaning']}<br><br><i>{translation['example']}</i>"
+            back = f"{translation['meaning']}<br><br>{translation['example']}"
 
             self.cards.append((front, back))
 

@@ -143,6 +143,10 @@ dmypy.json
 # API keys
 .env
 
-# markdown files
+# Obsidian plugin build files
+obsidian-plugin/node_modules/
+obsidian-plugin/main.js
+obsidian-plugin/.hotreload
+obsidian-plugin/
 *.md
-*.txt
+*.sh

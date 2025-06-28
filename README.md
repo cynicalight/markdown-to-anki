@@ -1,10 +1,18 @@
 # Markdown to Anki Converter
 
-将Markdown文档中的标记内容转换为Anki闪卡的Python工具。
+将Markdown文档中的标记内容转换为Anki闪卡的工具集，包含命令行版本和Obsidian插件版本。
+
+## 🎯 两种使用方式
+
+### 1. 命令行脚本版本
+适合独立使用，可以处理任意Markdown文件。
+
+### 2. Obsidian插件版本  
+直接在Obsidian中使用，无需切换应用，一键处理当前文档。
 
 ## 开发目的
 
-在**英语学习**过程中，我们经常会在阅读材料中标记重要的生词、词组和好句子。本项目旨在自动化将这些标记内容转换为Anki闪卡，提高学习效率，让知识积累更加系统化。
+在**英语学习**过程中，我们经常会在阅读材料中标记重要的生词、词组和好句子并尝试记忆。本项目旨在自动化将这些标记内容转换为Anki闪卡，提高学习效率，让知识积累更加系统化。
 
 - 不止英语学习，可以根据需要自行修改prompt，生成其他类型的闪卡，比如名词解释等。
 
@@ -42,10 +50,16 @@
 
 ```
 md-to-anki/
-├── md_to_anki.py          # 主程序脚本
+├── md_to_anki.py          # 主程序脚本（命令行版本）
 ├── requirements.txt       # Python依赖包
 ├── README.md             # 项目说明文档
 ├── Getting girlhood right.md  # 示例Markdown文档
+├── obsidian-plugin/       # Obsidian插件版本
+│   ├── main.ts           # 插件主代码
+│   ├── manifest.json     # 插件清单
+│   ├── package.json      # 依赖配置
+│   ├── README.md         # 插件说明
+│   └── INSTALL.md        # 安装指南
 └── output/               # 输出文件目录（生成）
     └── *.txt            # 生成的Anki闪卡文件
 ```
@@ -78,7 +92,9 @@ md-to-anki/
 
 ## 安装和使用
 
-### 1. 环境准备
+### 命令行版本
+
+#### 1. 环境准备
 
 ```bash
 # 克隆项目
@@ -89,7 +105,7 @@ cd md-to-anki
 pip install -r requirements.txt
 ```
 
-### 2. 配置API密钥
+#### 2. 配置API密钥
 
 获取DeepSeek API密钥并设置环境变量：
 
@@ -101,7 +117,7 @@ export DEEPSEEK_API_KEY="your_api_key_here"
 set DEEPSEEK_API_KEY=your_api_key_here
 ```
 
-### 3. 准备Markdown文档
+#### 3. 准备Markdown文档
 
 在Markdown文档中使用以下格式标记学习内容：
 
@@ -115,13 +131,26 @@ set DEEPSEEK_API_KEY=your_api_key_here
 另一个**vocabulary**出现在这个句子中。
 ```
 
-### 4. 运行脚本
+#### 4. 运行脚本
 
 ```bash
-python md_to_anki.py your_document.md
+python3 md_to_anki.py your_document.md
 ```
 
-### 5. 导入Anki
+### Obsidian插件版本
+
+#### 1. 安装插件
+
+详细安装步骤请查看：[obsidian-plugin/INSTALL.md](obsidian-plugin/INSTALL.md)
+
+#### 2. 配置和使用
+
+1. 在Obsidian设置中配置DeepSeek API密钥
+2. 在Markdown文档中标记学习内容
+3. 使用命令面板搜索"转换当前文件为Anki闪卡"
+4. 等待处理完成
+
+### 5. 导入Anki（通用步骤）
 
 1. 打开Anki桌面版
 2. 选择"文件" → "导入"
