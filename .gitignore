@@ -148,5 +148,4 @@ obsidian-plugin/
 
 # private
 *.sh
-RELEASE_GUIDE.md
-RELEASE_CHECKLIST.md
+PROJECT_SUMMARY.md
