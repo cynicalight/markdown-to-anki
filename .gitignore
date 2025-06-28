@@ -145,3 +145,4 @@ dmypy.json
 
 # markdown files
 *.md
+*.txt
