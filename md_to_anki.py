@@ -227,7 +227,7 @@ class AnkiCardGenerator:
             self.cards.append((front, back))
 
             # 避免API频率限制
-            time.sleep(1)
+            time.sleep(0.1)
 
     def process_italic_phrases(self, italic_phrases: List[Tuple[str, str]]):
         """处理斜体文本（词组）"""
@@ -265,7 +265,7 @@ class AnkiCardGenerator:
             self.cards.append((front, back))
 
             # 避免API频率限制
-            time.sleep(1)
+            time.sleep(0.1)
 
     def export_to_anki(self, output_file: str):
         """导出为Anki可导入的txt文件"""
