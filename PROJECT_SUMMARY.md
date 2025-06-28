@@ -5,11 +5,13 @@
 成功将原有的Python命令行脚本转换为一个完整的工具集，包含：
 
 ### 1. 命令行版本 (Python)
+- [markdown-to-anki](https://github.com/cynicalight/markdown-to-anki)
 - **文件**: `md_to_anki.py`
 - **功能**: 独立的Python脚本，可处理任意Markdown文件
 - **优势**: 无需依赖特定编辑器，适合批处理
 
 ### 2. Obsidian插件版本 (TypeScript)
+- [markdown-to-anki-converter](https://github.com/cynicalight/Markdown-to-Anki-Converter)
 - **目录**: `obsidian-plugin/`
 - **功能**: 直接在Obsidian中处理当前文档
 - **优势**: 集成度高，工作流程更流畅
