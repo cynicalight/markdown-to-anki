@@ -5,9 +5,14 @@ Markdown to Anki Converter
 将Markdown文档中的标记内容转换为Anki闪卡的脚本
 
 功能：
-1. 提取加粗文本（生词）- 调用API翻译并生成闪卡
-2. 提取斜体文本（词组）- 调用API翻译并生成闪卡  
+1. 提取加粗文本（生词）- 调用API翻译并生成闪卡，自动提取单词原型
+2. 提取斜体文本（词组）- 调用API翻译并生成闪卡，自动提取词组原型
 3. 提取高亮文本（好句子）- 调用API翻译并生成闪卡
+
+特性：
+- 智能识别单词和词组的原型形式（动词原形、名词单数等）
+- 闪卡正面显示原型，背面包含含义、例句和文中变位形式
+- 支持时态、复数、比较级等各种变位形式的处理
 
 Author: Assistant
 Date: 2025-06-28
@@ -36,48 +41,66 @@ class DeepSeekAPI:
 
     def translate_word(self, word: str, context: str) -> Dict[str, str]:
         """翻译生词，返回含义和例句"""
-        prompt = f"""请翻译英文单词"{word}"在以下句子中的含义：
+        prompt = f"""请分析英文单词"{word}"在以下句子中的含义，并提取其原型形式：
 
             句子：{context}
 
             请按以下JSON格式回复：
             {{
+                "base_form": "该单词的原型/基本形式（如果是动词则为原形，如果是名词则为单数形式等）",
                 "meaning": "该单词在此句子中的中文含义",
                 "example": "原句子"
             }}
 
-            只返回JSON，不要其他内容。"""
+            注意：
+            - base_form应该是单词的词典形式（动词原形、名词单数、形容词原级等）
+            - 如果单词本身就是原型，则base_form与原单词相同
+            - 只返回JSON，不要其他内容。"""
 
         try:
             response = self._make_request(prompt)
-            return json.loads(response)
+            result = json.loads(response)
+            # 确保返回的结果包含base_form字段
+            if 'base_form' not in result:
+                result['base_form'] = word  # 如果没有base_form，使用原单词
+            return result
         except Exception as e:
             print(f"翻译单词 '{word}' 时出错: {e}")
             return {
+                "base_form": word,
                 "meaning": f"翻译失败: {word}",
                 "example": context
             }
 
     def translate_phrase(self, phrase: str, context: str) -> Dict[str, str]:
         """翻译词组，返回含义和例句"""
-        prompt = f"""请翻译英文词组"{phrase}"在以下句子中的含义：
+        prompt = f"""请分析英文词组"{phrase}"在以下句子中的含义，并提取其原型形式：
 
             句子：{context}
 
             请按以下JSON格式回复：
             {{
+                "base_form": "该词组的原型/基本形式（动词短语用原形，去掉时态变化等）",
                 "meaning": "该词组在此句子中的中文含义",
                 "example": "原句子"
             }}
 
-            只返回JSON，不要其他内容。"""
+            注意：
+            - base_form应该是词组的基本形式（如动词短语的原形、介词短语的基本形式等）
+            - 如果词组本身就是原型，则base_form与原词组相同
+            - 只返回JSON，不要其他内容。"""
 
         try:
             response = self._make_request(prompt)
-            return json.loads(response)
+            result = json.loads(response)
+            # 确保返回的结果包含base_form字段
+            if 'base_form' not in result:
+                result['base_form'] = phrase  # 如果没有base_form，使用原词组
+            return result
         except Exception as e:
             print(f"翻译词组 '{phrase}' 时出错: {e}")
             return {
+                "base_form": phrase,
                 "meaning": f"翻译失败: {phrase}",
                 "example": context
             }
@@ -220,14 +243,18 @@ class AnkiCardGenerator:
             # 调用API翻译
             translation = self.api_client.translate_word(word, sentence)
 
-            # 生成闪卡
-            front = word
+            # 生成闪卡 - 使用原型形式作为正面
+            front = translation['base_form']
             back = f"{translation['meaning']}<br><br>{translation['example']}"
+
+            # 如果原型与原文不同，在背面添加变位形式的说明
+            if translation['base_form'].lower() != word.lower():
+                back = f"{translation['meaning']}<br><br>文中形式: {word}<br>{translation['example']}"
 
             self.cards.append((front, back))
 
             # 避免API频率限制
-            time.sleep(0.1)
+            time.sleep(1)
 
     def process_italic_phrases(self, italic_phrases: List[Tuple[str, str]]):
         """处理斜体文本（词组）"""
@@ -239,14 +266,18 @@ class AnkiCardGenerator:
             # 调用API翻译
             translation = self.api_client.translate_phrase(phrase, sentence)
 
-            # 生成闪卡
-            front = phrase
+            # 生成闪卡 - 使用原型形式作为正面
+            front = translation['base_form']
             back = f"{translation['meaning']}<br><br>{translation['example']}"
+
+            # 如果原型与原文不同，在背面添加变位形式的说明
+            if translation['base_form'].lower() != phrase.lower():
+                back = f"{translation['meaning']}<br><br>文中形式: {phrase}<br>{translation['example']}"
 
             self.cards.append((front, back))
 
             # 避免API频率限制
-            time.sleep(0.1)
+            time.sleep(1)
 
     def process_highlighted_sentences(self, sentences: List[str]):
         """处理高亮文本（好句子）"""
@@ -265,7 +296,7 @@ class AnkiCardGenerator:
             self.cards.append((front, back))
 
             # 避免API频率限制
-            time.sleep(0.1)
+            time.sleep(1)
 
     def export_to_anki(self, output_file: str):
         """导出为Anki可导入的txt文件"""

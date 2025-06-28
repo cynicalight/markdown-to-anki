@@ -209,6 +209,50 @@ A: Anki导入时会自动检测重复内容，可以选择跳过或更新。
 - [ ] 添加闪卡模板自定义功能
 - [ ] 支持音频文件生成（TTS）
 
+## 🎯 功能改进: 原型提取
+
+现在脚本已经升级，支持**智能原型提取**功能！
+
+### ✨ 主要改进
+
+#### 1. **单词原型提取**
+- **动词时态**: `walked` → `walk`
+- **名词复数**: `children` → `child`, `mice` → `mouse`  
+- **形容词比较级**: `better` → `good`, `most efficient` → `efficient`
+- **过去分词**: `broken` → `break`, `written` → `write`
+- **现在分词**: `running` → `run`
+
+#### 2. **词组原型提取**  
+- **动词短语时态**: `has been working` → `work`
+- **完成时态**: `will have finished` → `finish`
+- **过去时短语**: `gave me directions` → `give directions`
+
+#### 3. **闪卡格式优化**
+- **正面**: 显示原型形式（便于学习和记忆）
+- **背面**: 包含含义、例句，以及文中的变位形式（如果不同）
+
+
+### 支持的变位类型：
+
+1. **动词变位**
+   - 过去时: `went` → `go`
+   - 现在分词: `running` → `run`
+   - 过去分词: `broken` → `break`
+   - 第三人称单数: `goes` → `go`
+
+2. **名词变位**
+   - 复数: `children` → `child`
+   - 不规则复数: `mice` → `mouse`
+
+3. **形容词变位**
+   - 比较级: `better` → `good`
+   - 最高级: `best` → `good`
+
+4. **动词短语**
+   - 时态变化: `has been working` → `work`
+   - 完成时: `will have finished` → `finish`
+
+
 ## 贡献
 
 欢迎提交Issue和Pull Request来改进这个项目！

@@ -148,4 +148,4 @@ obsidian-plugin/
 
 # private
 *.sh
-PROJECT_SUMMARY.md
+*.md
