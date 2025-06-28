@@ -147,6 +147,5 @@ dmypy.json
 obsidian-plugin/node_modules/
 obsidian-plugin/main.js
 obsidian-plugin/.hotreload
-obsidian-plugin/
 *.md
 *.sh

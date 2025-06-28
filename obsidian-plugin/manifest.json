@@ -1,0 +1,11 @@
+{
+    "id": "md-to-anki-converter",
+    "name": "Markdown to Anki Converter",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "将Markdown文档中的标记内容（加粗、斜体、高亮）转换为Anki闪卡",
+    "author": "Jie Zhang",
+    "authorUrl": "https://github.com/cynicalight/md-to-anki-converter",
+    "fundingUrl": "",
+    "isDesktopOnly": false
+}
