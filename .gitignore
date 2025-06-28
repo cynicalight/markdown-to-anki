@@ -151,3 +151,4 @@ obsidian-plugin/.hotreload
 # private
 *.sh
 RELEASE_GUIDE.md
+RELEASE_CHECKLIST.md
